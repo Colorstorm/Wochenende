@@ -12,6 +12,7 @@ TODOs:
   and test this vs alternatives to Trimmomatic, eg
 
 Changelog
+1.6.3 solve idxstats bug, rename function names in progress file
 1.6.2 make more general for new users, improve initial error messages
 1.6.1 solve ngmlr bugs, solve minimap2 @SQ problem with --split-prefix temp_name
 1.6 add ngmlr aligner, --longreads now omits Picard remove_dups by default (fails)
@@ -785,32 +786,32 @@ def main(args, sys_argv):
         currentFile = runFunc("runAligner", runAligner, currentFile, True,
                                  args.aligner, path_refseq_dict.get(args.metagenome),
                                  args.threads, args.readType)
-        currentFile = runFunc("runBAMsort", runBAMsort, currentFile, True)
-        currentFile = runFunc("runBAMindex", runBAMindex, currentFile, False)
+        currentFile = runFunc("runBAMsort_aligner", runBAMsort, currentFile, True)
+        currentFile = runFunc("runBAMindex_aligner", runBAMindex, currentFile, False)
         currentFile = runFunc("runSamtoolsFlagstat", runSamtoolsFlagstat, currentFile, False)
         currentFile = runFunc("runGetUnmappedReads", runGetUnmappedReads, currentFile, False)
 
         if args.mq30:
             currentFile = runFunc("runMQ30", runMQ30, currentFile, True)
-            currentFile = runFunc("runBAMindex", runBAMindex, currentFile, False)
-            currentFile = runFunc("runIDXstats", runIDXstats, currentFile, False)
+            currentFile = runFunc("runBAMindex_MQ30", runBAMindex, currentFile, False)
+            currentFile = runFunc("runIDXstats_MQ30", runIDXstats, currentFile, False)
 
         if args.remove_mismatching and not args.longread:
             currentFile = runFunc("runBamtools", runBamtools, currentFile, True)
-            currentFile = runFunc("runBAMindex", runBAMindex, currentFile, False)
-            currentFile = runFunc("runIDXstats", runIDXstats, currentFile, False)
+            currentFile = runFunc("runBAMindex_remove_miss", runBAMindex, currentFile, False)
+            currentFile = runFunc("runIDXstats_remove_miss", runIDXstats, currentFile, False)
 
         if not args.no_duplicate_removal and not args.longread:
             currentFile = runFunc("markDups", markDups, currentFile, True)
-            currentFile = runFunc("runIDXstats", runIDXstats, currentFile, False)
+            currentFile = runFunc("runIDXstats_dups", runIDXstats, currentFile, False)
 
         if not args.no_abra and not args.longread:
             currentFile = runFunc("abra", abra, currentFile, True,
                                  path_refseq_dict.get(args.metagenome), threads)
         currentFile = runFunc("calmd", calmd, currentFile, True,
                                  path_refseq_dict.get(args.metagenome))
-        currentFile = runFunc("runBAMindex2", runBAMindex, currentFile, False)
-        currentFile = runFunc("runIDXstats", runIDXstats, currentFile, False)
+        currentFile = runFunc("runBAMindex_calmd", runBAMindex, currentFile, False)
+        currentFile = runFunc("runIDXstats_calmd", runIDXstats, currentFile, False)
 
 
 
@@ -835,8 +836,8 @@ def main(args, sys_argv):
         currentFile = runFunc("runAligner", runAligner, currentFile, True,
                                  args.aligner, path_refseq_dict.get(args.metagenome),
                                  args.threads, args.readType)
-        currentFile = runFunc("runBAMsort", runBAMsort, currentFile, True)
-        currentFile = runFunc("runBAMindex", runBAMindex, currentFile, False)
+        currentFile = runFunc("runBAMsort_aligner", runBAMsort, currentFile, True)
+        currentFile = runFunc("runBAMindex_aligner", runBAMindex, currentFile, False)
         currentFile = runFunc("runSamtoolsFlagstat", runSamtoolsFlagstat, currentFile, False)
         currentFile = runFunc("runGetUnmappedReads", runGetUnmappedReads, currentFile, False)
         if args.mq30:
@@ -851,8 +852,8 @@ def main(args, sys_argv):
                                  path_refseq_dict.get(args.metagenome), threads)
         currentFile = runFunc("calmd", calmd, currentFile, True,
                                  path_refseq_dict.get(args.metagenome))
-        currentFile = runFunc("runBAMindex2", runBAMindex, currentFile, False)
-        currentFile = runFunc("runIDXstats", runIDXstats, currentFile, False)
+        currentFile = runFunc("runBAMindex_calmd", runBAMindex, currentFile, False)
+        currentFile = runFunc("runIDXstats_calmd", runIDXstats, currentFile, False)
 
     else:
         print(" --readType must be set to either SE or PE (meaning single ended or paired-end)")
